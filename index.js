@@ -3,7 +3,9 @@ var app = express();
 const ejs = require("ejs");
 const bodyParser = require("body-parser");
 var crypto = require("crypto");
-const encryption = require("./encryption.js");
+const algorithm = "aes-256-cbc";
+const key = crypto.randomBytes(32);
+const iv = crypto.randomBytes(16);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
@@ -14,66 +16,50 @@ app.get("/", (req, res) => {
   res.render("index");
 });
 
-// app.get("/encrypt", (req, res) => {
-//   // get the text from the form
-//   var text = req.query.text;
-//   var password = req.query.password;
+function encrypt(text, password, algoType) {
+  let cipher = crypto.createCipheriv("aes-256-cbc", Buffer.from(key), iv);
+  let encrypted = cipher.update(password);
+  encrypted = Buffer.concat([encrypted, cipher.final()]);
+  const encryptedPass = encrypted.toString("hex");
+  console.log("encryptedPass: " + encryptedPass);
+  return encryptedPass;
 
-//   // encrypt the password
-//   const key = crypto.scryptSync(password, "salt", 32);
-//   var iv = crypto.randomBytes(16);
-//   var cipher = crypto.createCipheriv("aes-256-ctr", key, iv);
-//   var crypted = cipher.update(text, "utf8", "hex") + cipher.final("hex");
-//   // render the encrypted text and decrypted text
-//   res.render("encrypt", {
-//     text: text,
-//     password: password,
-//     crypted_text: crypted,
-//     // decrypted_text: decrypted
-//   });
+}
 
-//   console.log(crypted);
-// });
+// function decrypt(password) {
+//   let iv = Buffer.from(password.iv, "hex");
+//   let encryptedText = Buffer.from(text.encryptedPass, "hex");
+//   let decipher = crypto.createDecipheriv("aes-256-cbc", Buffer.from(key), iv);
+//   let decrypted = decipher.update(encryptedText);
+//   decrypted = Buffer.concat([decrypted, decipher.final()]);
+//   const decryptedPass = decrypted.toString();
+//   console.log("decryptedPass: " + decryptedPass);
+//   return decryptedPass;
+// }
 
 app.get("/encrypt", (req, res) => {
-  // import the encrypt function from encryption.js
-  const encrypt = encryption.encrypt;
   // get the text from the form
-  var text = req.body.text;
-  var password = req.body.password;
+  var text = req.query.text;
+  var password = req.query.password;
+  var algoType = req.query.algo_chosen;
 
-  // encrypt the password
-  var encrypted = encrypt(text, password);
+  // passing to text and password to the encypt function
+  var crypted = encrypt(text, password, algoType);
+  
   // render the encrypted text and decrypted text
   res.render("encrypt", {
     text: text,
     password: password,
-    crypted_text: encrypted,
+    crypted_text: crypted,
     // decrypted_text: decrypted
   });
-  console.log(encrypted);
-
 });
 
-  
+// app.get("/decrypt", (req, res) => {
+//   var decrypted = decrypt(crypted);
+//   console.log("decrypted: " + decrypted);
 
-function decrypt(text) {
-  let iv = Buffer.from(text.iv, 'hex');
-  let encryptedText = Buffer.from(text.encryptedData, 'hex');
-  let decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(key), iv);
-  let decrypted = decipher.update(encryptedText);
-  decrypted = Buffer.concat([decrypted, decipher.final()]);
-  return decrypted.toString();
- }
-
-
-app.get("/decrypt", (req, res) => {
-  decrypt(req.query.text);
-  res.render("decrypt", {
-    password: req.query.password,
-    decrypted_text: decrypt(req.query.text)
-  });
-});
+// });
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
