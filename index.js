@@ -3,38 +3,36 @@ var app = express();
 const ejs = require("ejs");
 const bodyParser = require("body-parser");
 var crypto = require("crypto");
-const { type } = require("os");
 
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
 const port = 3000;
 
 app.get("/", (req, res) => {
-    res.render("index");
+  res.render("index");
 });
 
 app.get("/encrypt", (req, res) => {
-// get the text from the form
-    var text = req.query.text;
-    var password = req.query.password;
-    
-    // encrypt the password 
-    const key = crypto.scryptSync(password, 'salt', 32);
-    var iv = crypto.randomBytes(16);
-    var cipher = crypto.createCipheriv("aes-256-ctr", key, iv);
-    var crypted = cipher.update(text, "utf8", "hex") + cipher.final("hex");
+  // get the text from the form
+  var text = req.query.text;
+  var password = req.query.password;
 
-    // render the encrypted text and decrypted text
-    res.render("encrypt", {
-        text: text,
-        password: password,
-        crypted_text: crypted,
-        decrypted_text: decrypted
-    });
+  // encrypt the password 
+  const key = crypto.scryptSync(password, 'salt', 32);
+  var iv = crypto.randomBytes(16);
+  var cipher = crypto.createCipheriv("aes-256-ctr", key, iv);
+  var crypted = cipher.update(text, "utf8", "hex") + cipher.final("hex");
 
+  // render the encrypted text and decrypted text
+  res.render("encrypt", {
+    text: text,
+    password: password,
+    crypted_text: crypted
+  });
 
-    console.log(crypted);
+  console.log("hello");
+  console.log(crypted);
 });
 
 app.get("/decrypt", (req, res) => {
