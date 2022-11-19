@@ -30,7 +30,7 @@ app.get("/encrypt", (req, res) => {
         text: text,
         password: password,
         crypted_text: crypted,
-        decrypted_text: decrypted
+        // decrypted_text: decrypted
     });
 
 
