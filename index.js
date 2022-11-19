@@ -15,13 +15,23 @@ app.get("/", (req, res) => {
 
 function encrypt(text, password, algoType) {
 
-  // encrypt the password
-  const key = crypto.scryptSync(password, "salt", 32);
-  var iv = crypto.randomBytes(16);
-  var cipher = crypto.createCipheriv("aes-256-ctr", key, iv);
-  var crypted = cipher.update(text, "utf8", "hex") + cipher.final("hex");
+  switch (algoType) {
+    case 1:
+      // AES algo
+      var key = crypto.scryptSync(password, "salt", 32);
+      var iv = crypto.randomBytes(16);
+      var cipher = crypto.createCipheriv("aes-256-ctr", key, iv);
+      var crypted = cipher.update(text, "utf8", "hex") + cipher.final("hex");
+      return crypted;
 
-  return crypted;
+    case 2:
+      // Hashing algo
+
+    case 3:
+      // Salting algo
+
+  }
+
 }
 
 app.get("/encrypt", (req, res) => {
