@@ -16,26 +16,22 @@ app.get("/", (req, res) => {
   res.render("index");
 });
 
-function encrypt(text, password, algoType) {
+function encrypt(password, algoType) {
   let cipher = crypto.createCipheriv("aes-256-cbc", Buffer.from(key), iv);
   let encrypted = cipher.update(password);
   encrypted = Buffer.concat([encrypted, cipher.final()]);
-  const encryptedPass = encrypted.toString("hex");
-  console.log("encryptedPass: " + encryptedPass);
-  return encryptedPass;
+  return { iv: iv.toString("hex"), encryptedData: encrypted.toString("hex") };
 
 }
 
-// function decrypt(password) {
-//   let iv = Buffer.from(password.iv, "hex");
-//   let encryptedText = Buffer.from(text.encryptedPass, "hex");
-//   let decipher = crypto.createDecipheriv("aes-256-cbc", Buffer.from(key), iv);
-//   let decrypted = decipher.update(encryptedText);
-//   decrypted = Buffer.concat([decrypted, decipher.final()]);
-//   const decryptedPass = decrypted.toString();
-//   console.log("decryptedPass: " + decryptedPass);
-//   return decryptedPass;
-// }
+function decrypt(text) {
+  let iv = Buffer.from(text.iv, "hex");
+  let encryptedText = Buffer.from(text.encryptedData, "hex");
+  let decipher = crypto.createDecipheriv("aes-256-cbc", Buffer.from(key), iv);
+  let decrypted = decipher.update(encryptedText);
+  decrypted = Buffer.concat([decrypted, decipher.final()]);
+  return decrypted.toString();
+} 
 
 app.get("/encrypt", (req, res) => {
   // get the text from the form
@@ -43,23 +39,18 @@ app.get("/encrypt", (req, res) => {
   var password = req.query.password;
   var algoType = req.query.algo_chosen;
 
-  // passing to text and password to the encypt function
-  var crypted = encrypt(text, password, algoType);
+  // passing password to the encypt function
+  var crypted = encrypt(password, algoType);
+  var decrypted = decrypt(crypted);
   
   // render the encrypted text and decrypted text
   res.render("encrypt", {
     text: text,
     password: password,
-    crypted_text: crypted,
-    // decrypted_text: decrypted
+    crypted_text: crypted.encryptedData,
+    decrypted_text: decrypted
   });
 });
-
-// app.get("/decrypt", (req, res) => {
-//   var decrypted = decrypt(crypted);
-//   console.log("decrypted: " + decrypted);
-
-// });
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
