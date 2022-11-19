@@ -3,39 +3,44 @@ var app = express();
 const ejs = require("ejs");
 const bodyParser = require("body-parser");
 var crypto = require("crypto");
-const algorithm = "aes-256-cbc";
-const key = crypto.randomBytes(32);
-const iv = crypto.randomBytes(16);
+const md5 = require("md5");
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
 const port = 3000;
+const algorithm = "aes-256-cbc";
+const key = crypto.randomBytes(32);
+const iv = crypto.randomBytes(16);
 
 app.get("/", (req, res) => {
   res.render("index");
 });
 
 function encrypt(text, password, algoType) {
-  let cipher = crypto.createCipheriv("aes-256-cbc", Buffer.from(key), iv);
-  let encrypted = cipher.update(password);
-  encrypted = Buffer.concat([encrypted, cipher.final()]);
-  const encryptedPass = encrypted.toString("hex");
-  console.log("encryptedPass: " + encryptedPass);
-  return encryptedPass;
+  switch (algoType) {
+    case 1:
+      // AES algo
+      let cipher = crypto.createCipheriv("aes-256-cbc", Buffer.from(key), iv);
+      let encrypted = cipher.update(password);
+      encrypted = Buffer.concat([encrypted, cipher.final()]);
+      const encryptedPass = encrypted.toString("hex");
+      return encryptedPass;
 
+    case 2:
+      // Hashing algo
+      let pass = md5(password);
+      return pass;
+
+    case 3:
+      // Salting algo
+      const hash = bcrypt.hashSync(password, saltRounds);
+      return hash;
+
+  }
 }
-
-// function decrypt(password) {
-//   let iv = Buffer.from(password.iv, "hex");
-//   let encryptedText = Buffer.from(text.encryptedPass, "hex");
-//   let decipher = crypto.createDecipheriv("aes-256-cbc", Buffer.from(key), iv);
-//   let decrypted = decipher.update(encryptedText);
-//   decrypted = Buffer.concat([decrypted, decipher.final()]);
-//   const decryptedPass = decrypted.toString();
-//   console.log("decryptedPass: " + decryptedPass);
-//   return decryptedPass;
-// }
 
 app.get("/encrypt", (req, res) => {
   // get the text from the form
@@ -43,23 +48,49 @@ app.get("/encrypt", (req, res) => {
   var password = req.query.password;
   var algoType = req.query.algo_chosen;
 
-  // passing to text and password to the encypt function
-  var crypted = encrypt(text, password, algoType);
+  // passing the text and password to the encypt function
+  var crypted = encrypt(text, password, parseInt(algoType));
   
-  // render the encrypted text and decrypted text
+  // render the encrypted text
   res.render("encrypt", {
     text: text,
     password: password,
-    crypted_text: crypted,
-    // decrypted_text: decrypted
+    crypted_text: crypted, 
+    algo_type: algoType
   });
 });
 
-// app.get("/decrypt", (req, res) => {
-//   var decrypted = decrypt(crypted);
-//   console.log("decrypted: " + decrypted);
+function decrypt(crypted_text, algoType) {
+  switch (algoType) {
+    case 1:
+      // AES algo
 
-// });
+    case 2:
+      // Hashing algo
+
+    case 3:
+      // Salting algo
+
+  }
+}
+
+app.get("/decrypt", (req, res) => {
+  // console.log("decrypted: " + decrypted);
+  var crypted_text = req.query.crypted_text;
+  var algoType = req.query.algo_type;
+  
+  // sending it to get decrypted
+  var decrypted = decrypt(crypted_text, parseInt(algoType));
+
+  // render the decrypted text
+  res.render("encrypt", {
+    text: text,
+    password: password,
+    crypted_text: crypted_text, 
+    algo_type: algoType,
+    decrypted_text: decrypted
+  });
+});
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);

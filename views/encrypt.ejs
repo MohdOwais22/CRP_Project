@@ -8,12 +8,22 @@
         <h1><%= text %></h1>
         
         <h1><%= password %></h1>
+
         <h1><%= crypted_text %></h1>
-        <!-- <form action="/encrypt">
+
+        <h1><%= algo_type %></h1>
+
+        <% if(parseInt(algo_type) == 2 || parseInt(algo_type) == 3) {} else{ %>
+
+        <form action="/decrypt" method="">
+            <input type="hidden" name="crypted_text" value="<%= crypted_text %>">
+            <input type="hidden" name="algo_type" value="<%= algo_type %>">
             <button type="submit">
                 Decrypt
             </button>
-        </form> -->
+        </form>
+
+        <% } %>
         
     </body>
 </html>
