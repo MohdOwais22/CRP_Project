@@ -3,15 +3,17 @@ var app = express();
 const ejs = require("ejs");
 const bodyParser = require("body-parser");
 var crypto = require("crypto");
-const algorithm = "aes-256-cbc";
-const key = crypto.randomBytes(32);
-const iv = crypto.randomBytes(16);
 const md5 = require("md5");
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
 const port = 3000;
+const algorithm = "aes-256-cbc";
+const key = crypto.randomBytes(32);
+const iv = crypto.randomBytes(16);
 
 app.get("/", (req, res) => {
   res.render("index");
@@ -34,20 +36,11 @@ function encrypt(text, password, algoType) {
 
     case 3:
       // Salting algo
+      const hash = bcrypt.hashSync(password, saltRounds);
+      return hash;
 
   }
 }
-
-// function decrypt(password) {
-//   let iv = Buffer.from(password.iv, "hex");
-//   let encryptedText = Buffer.from(text.encryptedPass, "hex");
-//   let decipher = crypto.createDecipheriv("aes-256-cbc", Buffer.from(key), iv);
-//   let decrypted = decipher.update(encryptedText);
-//   decrypted = Buffer.concat([decrypted, decipher.final()]);
-//   const decryptedPass = decrypted.toString();
-//   console.log("decryptedPass: " + decryptedPass);
-//   return decryptedPass;
-// }
 
 app.get("/encrypt", (req, res) => {
   // get the text from the form
@@ -71,13 +64,6 @@ function decrypt(crypted_text, algoType) {
   switch (algoType) {
     case 1:
       // AES algo
-      let iv = Buffer.from(password.iv, "hex");
-      let encryptedText = Buffer.from(text.encryptedPass, "hex");
-      let decipher = crypto.createDecipheriv("aes-256-cbc", Buffer.from(key), iv);
-      let decrypted = decipher.update(encryptedText);
-      decrypted = Buffer.concat([decrypted, decipher.final()]);
-      const decryptedPass = decrypted.toString();
-      return decryptedPass;
 
     case 2:
       // Hashing algo
