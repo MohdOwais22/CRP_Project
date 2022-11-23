@@ -8,6 +8,7 @@ const bcrypt = require("bcrypt");
 // setting up the various modules
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
+app.use(express.static("public"));
 // variables used
 const port = 3000;
 const algorithm = "aes-256-cbc";
