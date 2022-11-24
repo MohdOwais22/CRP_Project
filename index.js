@@ -5,16 +5,20 @@ const bodyParser = require("body-parser");
 var crypto = require("crypto");
 const md5 = require("md5");
 const bcrypt = require("bcrypt");
+// import env
+require("dotenv").config();
+
 // setting up the various modules
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 // variables used
-const port = 3000;
+const port = process.env.PORT || 3000;
 const algorithm = "aes-256-cbc";
 const key = crypto.randomBytes(32);
 const iv = crypto.randomBytes(16);
 const saltRounds = 10;
+
 // getting to the home route
 app.get("/", (req, res) => {
   res.render("index");
@@ -27,7 +31,10 @@ function encrypt(password, algoType) {
       let cipher = crypto.createCipheriv("aes-256-cbc", Buffer.from(key), iv);
       let encrypted = cipher.update(password);
       encrypted = Buffer.concat([encrypted, cipher.final()]);
-      return { iv: iv.toString("hex"), encryptedData: encrypted.toString("hex") };
+      return {
+        iv: iv.toString("hex"),
+        encryptedData: encrypted.toString("hex"),
+      };
     case 2:
       // Hashing algo
       let hash = md5(password);
@@ -53,7 +60,7 @@ app.get("/encrypt", (req, res) => {
       password: password,
       crypted_text: crypted,
       algo_type: algoType,
-      crypted_text: crypted.encryptedData
+      crypted_text: crypted.encryptedData,
     });
   } else {
     // for hashing and salting
@@ -62,7 +69,7 @@ app.get("/encrypt", (req, res) => {
       password: password,
       crypted_text: crypted,
       algo_type: algoType,
-      crypted_text: crypted
+      crypted_text: crypted,
     });
   }
 });
@@ -88,8 +95,8 @@ app.get("/decrypt", (req, res) => {
     text: text,
     password: password,
     crypted_text: crypted.encryptedData,
-    algo_type: algoType, 
-    decrypted_text: decrypted_text
+    algo_type: algoType,
+    decrypted_text: decrypted_text,
   });
 });
 // listening to the port
