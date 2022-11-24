@@ -28,7 +28,7 @@ function encrypt(password, algoType) {
   switch (algoType) {
     case 1:
       // AES algo
-      let cipher = crypto.createCipheriv("aes-256-cbc", Buffer.from(key), iv);
+      let cipher = crypto.createCipheriv(algorithm, Buffer.from(key), iv);
       let encrypted = cipher.update(password);
       encrypted = Buffer.concat([encrypted, cipher.final()]);
       return {
@@ -77,7 +77,7 @@ app.get("/encrypt", (req, res) => {
 function decrypt(text) {
   let iv = Buffer.from(text.iv, "hex");
   let encryptedText = Buffer.from(text.encryptedData, "hex");
-  let decipher = crypto.createDecipheriv("aes-256-cbc", Buffer.from(key), iv);
+  let decipher = crypto.createDecipheriv(algorithm, Buffer.from(key), iv);
   let decrypted = decipher.update(encryptedText);
   decrypted = Buffer.concat([decrypted, decipher.final()]);
   return decrypted.toString();
