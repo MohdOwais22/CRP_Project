@@ -17,21 +17,9 @@
     
   <img class="profile-pic" src="https://cdn.discordapp.com/attachments/963207924656795680/1027005573499199609/3982230923_Gigachad.png" />
   <h2>Welcome <%= text %></h2>
-  <h3>Your Password is safe and encrypted</h3>
   <p><%= crypted_text %></p>
 
   
-  <% if(parseInt(algo_type) == 2 || parseInt(algo_type) == 3) {} else{ %>
-    <form action="/decrypt" method="">
-        <input type="hidden" name="crypted_text" value="<%= crypted_text %>">
-        <input type="hidden" name="text" value="<%= text %>">
-        <input type="hidden" name="password" value="<%= password %>">
-        <input type="hidden" name="algo_type" value="<%= algo_type %>">
-        <button type="submit">
-           Click to Decrypt Your Password
-        </button>
-    </form>
-    <% } %>
 
     <h2>Your Password got hacked</h2>
     <h3>Here is the password</h3>
