@@ -9,10 +9,11 @@
 
 body {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column;
     min-height: 100vh;
     background: #1e2029;
+    justify-content: center;
+    align-items: center;
 }
 
 .box {
@@ -80,7 +81,7 @@ body {
 .inputBox {
     position: relative;
     width: 300px;
-    margin-top: 35px;
+    margin-top: 25px;
 }
 
 .inputBox input {
@@ -166,4 +167,16 @@ background: #45f3ff;
 .button:hover,
 .button:focus {  
     opacity: 0.7;
+}
+
+#algo_type{
+    background: #28292d;
+    border: none;
+    outline: none;
+    border-bottom: #45f3ff 2px solid;
+    color: #8f8f8f;
+    font-size: 1em;
+    letter-spacing: 0.05px;
+    border-radius: 4px;
+    width: 100%;
 }
