@@ -1,3 +1,4 @@
+require("dotenv").config();
 var express = require("express");
 var app = express();
 const ejs = require("ejs");
@@ -5,15 +6,12 @@ const bodyParser = require("body-parser");
 var crypto = require("crypto");
 const md5 = require("md5");
 const bcrypt = require("bcrypt");
-// import env
-require("dotenv").config();
-
 // setting up the various modules
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 // variables used
-const port = process.env.PORT || 3000;
+// const port = process.env.PORT;
 const algorithm = "aes-256-cbc";
 const key = crypto.randomBytes(32);
 const iv = crypto.randomBytes(16);
@@ -99,7 +97,13 @@ app.get("/decrypt", (req, res) => {
     decrypted_text: decrypted_text,
   });
 });
-// listening to the port
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
+
+
+
+// creating the server
+app.listen(process.env.PORT, () => {
+  console.log(`Server started on port ${process.env.PORT}`);
 });
+
+
+
